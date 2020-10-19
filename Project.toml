@@ -1,0 +1,13 @@
+name = "TKTDsimulations"
+uuid = "e31a5254-3556-45b0-bb0a-af5ec6251750"
+authors = ["Virgile Baudrot"]
+version = "0.1.0"
+
+[compat]
+julia = "1.5"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
