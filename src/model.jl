@@ -1,12 +1,4 @@
-```jldoctest
-a = 1
-b = 2
-a + b
-
-# output
-
-3
-```
+function interpLinear(xpt::AbstractArray,ypt::AbstractArray,x)
     if x >= minimum(xpt) && x <= maximum(xpt)
         idx = findfirst(t->t>= x, xpt) -1
         idx == 0 ? idx += 1 : nothing
