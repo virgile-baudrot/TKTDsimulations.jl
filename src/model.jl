@@ -73,9 +73,12 @@ Solve ODE for Individual Tolerance TKTD model
 
 - `tps` -- time vector
 - `conc` -- exposure vector
-- `p` -- parameters
+- `kd` -- parameters
+- `hb` -- parameters
+- `alpha` -- parameters
+- `beta` -- parameters
 """
-function runIT(tps, conc, kd, hb, α, β)
+function runIT(tps, conc, kd, hb, alpha, beta)
     prob = DiffEqBase.ODEProblem(odeTK,[0.0],(0.0, maximum(tps)),[tps, conc, kd])
     _saveat = tps === nothing ? Float64[] : tps
     sol = DiffEqBase.solve(prob ; saveat = _saveat)
@@ -83,7 +86,7 @@ function runIT(tps, conc, kd, hb, α, β)
     pSurv = Array{Float64}(undef,length(tps))
     Dmax_tmp = accumulate(max, sol.u)
     for j in 1:length(Dmax_tmp)
-        pSurv[j] = exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], α,β))
+        pSurv[j] = exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta))
     end
     return DataFrames.DataFrame(
         time = tps,
