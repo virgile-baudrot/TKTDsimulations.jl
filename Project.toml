@@ -3,6 +3,11 @@ uuid = "e31a5254-3556-45b0-bb0a-af5ec6251750"
 authors = ["Virgile Baudrot"]
 version = "0.1.0"
 
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+
 [compat]
 julia = "1.5"
 
