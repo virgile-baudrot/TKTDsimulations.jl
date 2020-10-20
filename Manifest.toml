@@ -93,9 +93,9 @@ version = "0.3.0"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "f76e41cf110de7176a657c72409e722cfc86fbb6"
+git-tree-sha1 = "48608f94f3e1a755f65e7ef34684675bb3653030"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.20.0"
+version = "3.21.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -240,9 +240,9 @@ version = "0.25.2"
 
 [[DocumenterTools]]
 deps = ["Base64", "DocStringExtensions", "Documenter", "FileWatching", "LibGit2", "Sass"]
-git-tree-sha1 = "6fa30234228d9020cbe31e393e9d183e944845bb"
+git-tree-sha1 = "58952158c0fda2241761abd96a039ca13aa83c82"
 uuid = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
-version = "0.1.7"
+version = "0.1.8"
 
 [[ExponentialUtilities]]
 deps = ["LinearAlgebra", "Printf", "Requires", "SparseArrays"]
