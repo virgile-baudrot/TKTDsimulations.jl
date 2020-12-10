@@ -134,15 +134,7 @@ function runIT(tps, conc, kd, hb, alpha, beta)
     TK = [sol.u[j][1] for j in 1:length(sol)]
     Dmax_tmp = accumulate(max, sol.u)      
     TD = [ exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta)) for j in 1:length(sol)]
-    # for j in 1:length(Dmax_tmp)
-    #     pSurv[j] = exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta))
-    # end
-    # return DataFrames.DataFrame(
-    #     time = tps,
-    #     exposure = conc,
-    #     TK = [sol.u[j][1] for j in 1:length(sol)],
-    #     TD = pSurv
-    # )
+    
     return TK, TD
 end
 
@@ -202,42 +194,3 @@ end
 # ExposureProfile([1,3,3],[2.0,3.0,2.0])
 # ExposureProfile([1,3,2],[2.0,3.0,2.0])
 # ExposureProfile([1.0],[2.0,3.0])
-
-
-# """
-# Solve ODE defined by `ModelType` which can be `SD` or `IT`, an Array of `Parameters` and  an Array of `ExposureProfile`
-
-# **Fields**
-
-# - `ModelType` -- the model type.
-# - `Parameters`  -- a Matrix (or N vectors of same length without NA) defining parameter values.
-# - `ExposureProfile`   -- the exposure profile with tps and Column ( or 2 vectors of same length without NA -- a time serie ?).
-# """
-# function runGUTS(tps, conc, kd, hb, α, β)
-
-#     # 0.1 check length
-#     if length(tps) != length(conc)
-#         error("Objects `tps` and `conc` have different length.")
-#     end
-#     if !(length(hb) == length(kd) == length(α) == length(β))
-#         error("Parameters `hb`, `kd`, `α` and `β` have not the same length.")
-#     end
-#     # 1. init parameters
-#     u0 = [0.0]
-#     # Peut-être descritiser le temps sur une longueuer de 100 comme dans R?
-#     tspan = (0.0, maximum(tps))
-#     _saveat = tps === nothing ? Float64[] : tps
-#     pSurv = Array{Float64}(undef, length(tps), length(kd))
-
-#     # 2. solve problem
-#     for i in 1:length(kd)
-#         param = [tps, conc, kd[i]]
-#         prob = DiffEqBase.ODEProblem(odeTK, u0, tspan, param)
-#         sol_tmp = DiffEqBase.solve(prob ; saveat = _saveat)
-#         Dmax_tmp = accumulate(max, sol_tmp.u)
-#         for j in 1:length(Dmax_tmp)
-#             pSurv[j,i] = exp(-hb[i]*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], α[i], β[i]))
-#         end
-#     end
-#     return tps, pSurv
-# end
