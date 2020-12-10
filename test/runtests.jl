@@ -51,12 +51,6 @@ end
 end
 
 @testset "IT solver" begin
-    # 2.2 odeSD
-    @test_nowarn begin
-        probIT = ODEProblem(TKTDsimulations.odeIT, [0.0, 0.0], (0.0,3.0), [[0,1,2,3], [0,0,2,2], 0.5, 0.2, 0.3, 0.4])
-        _saveatIT = [0,1,2,3] === nothing ? Float64[] : [0,1,2,3]
-        solve(probIT ; saveat = _saveatIT)
-    end
 
     # TEST EXPORT FUNCTION: no need of TKTDsimulations specification because Export
     tps = [0,1,2,3]

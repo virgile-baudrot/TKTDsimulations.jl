@@ -35,11 +35,8 @@ function runTK(tps, conc, kd)
     prob = DiffEqBase.ODEProblem(odeTK,[0.0],(0.0, maximum(tps)),[tps, conc, kd])
     _saveat = tps === nothing ? Float64[] : tps
     sol = DiffEqBase.solve(prob ; saveat = _saveat)
-    return DataFrames.DataFrame(
-        time = tps,
-        exposure = conc,
-        TK = [sol.u[j][1] for j in 1:length(sol)]
-    )
+    TK = [sol.u[j][1] for j in 1:length(sol)]
+    return TK
 end
 
 """
@@ -134,7 +131,7 @@ function runIT(tps, conc, kd, hb, alpha, beta)
     TK = [sol.u[j][1] for j in 1:length(sol)]
     Dmax_tmp = accumulate(max, sol.u)      
     TD = [ exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta)) for j in 1:length(sol)]
-    
+
     return TK, TD
 end
 
