@@ -15,7 +15,7 @@ end
 
 function odeSD(du, u, p,t)
     du[1] = p[3] * (interpLinear(p[1],p[2],t)-u[1])
-    du[2] = p[4] + maximum([u[2] - p[5], 0]) * p[6]
+    du[2] = p[4] + maximum([u[1] - p[5], 0]) * p[6]
 end
 
 function logLogisticLaw(x, α, β)
@@ -23,13 +23,13 @@ function logLogisticLaw(x, α, β)
 end
 
 """
-Solve ODE for Stochastic Death TKTD model
+    Solve Toxicokinetics Models
 
 **Fields**
 
-- `tps` -- time vector
-- `conc` -- exposure vector
-- `p` -- parameters
+    - `tps` -- time vector
+    - `conc` -- exposure vector
+    - `kd` -- parameter, scalar
 """
 function runTK(tps, conc, kd)
     prob = DiffEqBase.ODEProblem(odeTK,[0.0],(0.0, maximum(tps)),[tps, conc, kd])
@@ -43,6 +43,26 @@ function runTK(tps, conc, kd)
 end
 
 """
+    Solve Toxicokinetics Models with MCMC parameters
+
+**Fields**
+
+    - `tps` -- time vector
+    - `conc` -- exposure vector
+    - `kd` -- parameter, scalar
+"""
+function runTK_MCMC(tps, conc, kd)
+    TK = Array{Array{Array{Float64,1},1}, 1}(undef, length(kd))
+    @inbounds for i in eachindex(kd)
+        prob = DiffEqBase.ODEProblem(odeTK,[0.0],(0.0, maximum(tps)),[tps, conc, kd[i]])
+        _saveat = tps === nothing ? Float64[] : tps
+        TK[i] = DiffEqBase.solve(prob ; saveat = _saveat).u
+    end
+    return TK 
+end
+
+
+"""
 Solve ODE for Stochastic Death TKTD model
 
 **Fields**
@@ -50,21 +70,46 @@ Solve ODE for Stochastic Death TKTD model
 - `tps` -- time vector
 - `conc` -- exposure vector
 - `kd` -- parameters
-- `hb` -- parameters
-- `z` -- parameters
-- `kk` -- parameters
+- `hb` -- background mortality
+- `z` -- threshold
+- `kk` -- killing rate
 """
 function runSD(tps, conc, kd, hb, z, kk)
     prob = DiffEqBase.ODEProblem(odeSD,[0.0, 0.0],(0.0, maximum(tps)),[tps, conc, kd, hb, z, kk])
     _saveat = tps === nothing ? Float64[] : tps
     sol = DiffEqBase.solve(prob ; saveat = _saveat)
-    return DataFrames.DataFrame(
-        time = tps,
-        exposure = conc,
-        TK = [sol.u[j][1] for j in 1:length(sol)],
-        TD = [sol.u[j][2] for j in 1:length(sol)]
-    )
+    TK = [sol.u[j][1] for j in 1:length(sol)]
+    TD = [exp(-sol.u[j][2]) for j in 1:length(sol)]
+    return TK, TD
 end
+
+
+"""
+Solve ODE for Stochastic Death TKTD model
+
+**Fields**
+
+- `tps` -- time vector
+- `conc` -- exposure vector
+- `kd` -- parameters
+- `hb` -- background mortality
+- `z` -- threshold
+- `kk` -- killing rate
+"""
+
+function runSD_MCMC(tps, conc, kd, hb, z, kk)
+    TK = Array{Array{Float64,1},1}(undef, length(kd))
+    TD = Array{Array{Float64,1},1}(undef, length(kd))
+    @inbounds for i in eachindex(kd)
+        prob = DiffEqBase.ODEProblem(odeSD,[0.0, 0.0],(0.0, maximum(tps)),[tps, conc, kd[i], hb[i], z[i], kk[i]])
+        _saveat = tps === nothing ? Float64[] : tps
+        sol = DiffEqBase.solve(prob ; saveat = _saveat)
+        TK[i] = [sol.u[j][1] for j in 1:length(sol)]
+        TD[i] = [exp(- sol.u[j][2]) for j in 1:length(sol)]
+    end
+    return TK, TD
+end
+
 
 """
 Solve ODE for Individual Tolerance TKTD model
@@ -85,13 +130,114 @@ function runIT(tps, conc, kd, hb, alpha, beta)
 
     pSurv = Array{Float64}(undef,length(tps))
     Dmax_tmp = accumulate(max, sol.u)
-    for j in 1:length(Dmax_tmp)
-        pSurv[j] = exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta))
-    end
-    return DataFrames.DataFrame(
-        time = tps,
-        exposure = conc,
-        TK = [sol.u[j][1] for j in 1:length(sol)],
-        TD = pSurv
-    )
+
+    TK = [sol.u[j][1] for j in 1:length(sol)]
+    Dmax_tmp = accumulate(max, sol.u)      
+    TD = [ exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta)) for j in 1:length(sol)]
+    # for j in 1:length(Dmax_tmp)
+    #     pSurv[j] = exp(-hb*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha,beta))
+    # end
+    # return DataFrames.DataFrame(
+    #     time = tps,
+    #     exposure = conc,
+    #     TK = [sol.u[j][1] for j in 1:length(sol)],
+    #     TD = pSurv
+    # )
+    return TK, TD
 end
+
+
+"""
+Solve ODE for Individual Tolerance TKTD model
+
+**Fields**
+
+- `tps` -- time vector
+- `conc` -- exposure vector
+- `kd` -- parameters
+- `hb` -- parameters
+- `alpha` -- parameters
+- `beta` -- parameters
+"""
+
+function runIT_MCMC(tps, conc, kd, hb, alpha, beta)
+    TK = Array{Array{Float64,1},1}(undef, length(kd))
+    TD = Array{Array{Float64,1},1}(undef, length(kd))
+    @inbounds for i in eachindex(kd)
+        prob = DiffEqBase.ODEProblem(odeTK,[0.0],(0.0, maximum(tps)),[tps, conc, kd[i]])
+        _saveat = tps === nothing ? Float64[] : tps
+        sol = DiffEqBase.solve(prob ; saveat = _saveat)
+        TK[i] = [sol.u[j][1] for j in 1:length(sol)]
+        Dmax_tmp = accumulate(max, sol.u)      
+        TD[i] = [ exp(-hb[i]*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], alpha[i],beta[i])) for j in 1:length(sol)]
+    end
+    return TK, TD
+end
+
+
+# struct ExposureProfile{T<:Number,X<:Number}
+#     time::Array{T,1}
+#     exposure::Array{X,1}
+#     function ExposureProfile(time::Array{T,1},
+#                              exposure::Array{X,1}) where {T,X}
+#         if length(time) != length(exposure)
+#             throw(ArgumentError("length of time and exposure differ"))
+#         end
+#         if length(time) != length(unique(time))
+#             throw(ArgumentError("values in time vector must be unique"))
+#         end
+#         if sort(time) != time
+#             throw(ArgumentError("time vector must be sorted"))
+#         end
+#         new{T,X}(time, exposure)
+#     end
+# end
+# ExposureProfile([1.0],[2.0])
+
+# ExposureProfile([1.0,2,3],[2.0,3.0,2.0])
+# ExposureProfile([1,2,3],[2.0,3.0,2.0])
+# ExposureProfile([1,2,3],[2.0,3.0,2.0]).time
+# ExposureProfile([1,2,3],[2.0,3.0,2.0]).exposure
+# # should return false
+# ExposureProfile([1,3,3],[2.0,3.0,2.0])
+# ExposureProfile([1,3,2],[2.0,3.0,2.0])
+# ExposureProfile([1.0],[2.0,3.0])
+
+
+# """
+# Solve ODE defined by `ModelType` which can be `SD` or `IT`, an Array of `Parameters` and  an Array of `ExposureProfile`
+
+# **Fields**
+
+# - `ModelType` -- the model type.
+# - `Parameters`  -- a Matrix (or N vectors of same length without NA) defining parameter values.
+# - `ExposureProfile`   -- the exposure profile with tps and Column ( or 2 vectors of same length without NA -- a time serie ?).
+# """
+# function runGUTS(tps, conc, kd, hb, α, β)
+
+#     # 0.1 check length
+#     if length(tps) != length(conc)
+#         error("Objects `tps` and `conc` have different length.")
+#     end
+#     if !(length(hb) == length(kd) == length(α) == length(β))
+#         error("Parameters `hb`, `kd`, `α` and `β` have not the same length.")
+#     end
+#     # 1. init parameters
+#     u0 = [0.0]
+#     # Peut-être descritiser le temps sur une longueuer de 100 comme dans R?
+#     tspan = (0.0, maximum(tps))
+#     _saveat = tps === nothing ? Float64[] : tps
+#     pSurv = Array{Float64}(undef, length(tps), length(kd))
+
+#     # 2. solve problem
+#     for i in 1:length(kd)
+#         param = [tps, conc, kd[i]]
+#         prob = DiffEqBase.ODEProblem(odeTK, u0, tspan, param)
+#         sol_tmp = DiffEqBase.solve(prob ; saveat = _saveat)
+#         Dmax_tmp = accumulate(max, sol_tmp.u)
+#         for j in 1:length(Dmax_tmp)
+#             pSurv[j,i] = exp(-hb[i]*tps[j])*(1-logLogisticLaw(Dmax_tmp[j][1], α[i], β[i]))
+#         end
+#     end
+#     return tps, pSurv
+# end
