@@ -2,13 +2,13 @@ module TKTDsimulations
 
     import DiffEqBase
     import DifferentialEquations
-    import DataFrames
+    # import DataFrames
 
     include("model.jl") 
 
-    export runTK
-    export runSD
-    export runIT
+    export runTK, runTK_MCMC
+    export runSD, runSD_MCMC
+    export runIT, runIT_MCMC
     # export runGUTS
 
 end
