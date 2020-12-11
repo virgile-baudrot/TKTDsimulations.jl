@@ -52,7 +52,6 @@ end
 
 @testset "IT solver" begin
 
-    # TEST EXPORT FUNCTION: no need of TKTDsimulations specification because Export
     tps = [0,1,2,3]
     conc = [0,0,2,2]
     kd = 0.5
