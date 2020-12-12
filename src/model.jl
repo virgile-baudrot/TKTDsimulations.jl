@@ -35,7 +35,7 @@ end
 Return a Tuple with `Array{Float64,1}` of th same length as `tps`
 
 # Example
-```julia-repl
+```julia
 julia> myTK = runTK([0,1,2,3], [0,1,20,2], 0.5);
 julia> myTK.TK
 4-element Array{Float64,1}:
@@ -67,7 +67,7 @@ end
 Return an `Array{Array{Float64,1},1}`.
 
 # Example
-```julia-repl
+```julia
 julia> myTK = runTK_MCMC([0,1,2,3], [0,1,20,2], [0.5, 2.4]);
 
 julia> myTK.TK
@@ -109,7 +109,7 @@ Solve ODE for Stochastic Death TKTD model
 Return a Tuple of `Array{Float64,1}`.
 
 # Example
-```julia-repl
+```julia
 julia> mySD = runSD([0,1,2,3], [0,1,20,2], 0.5, 2.4, 16.3 ,10.0);
 
 julia> mySD.TK
@@ -158,7 +158,7 @@ Solve ODE for Stochastic Death TKTD model
 Return a Tuple of `Array{Array{Float64,1},1}`.
 
 # Example
-```julia-repl
+```julia
 julia> mySD = runSD_MCMC([0,1,2,3], [0,1,20,2], [0.5, 2.4],[2.5, 2.1],[10.5, 16.0],[5.0, 2.4]);
 
 julia> mySD.TK
@@ -207,7 +207,7 @@ Solve ODE for Individual Tolerance TKTD model
 Return an `Array{Float64,1}`.
 
 # Example
-```julia-repl
+```julia
 julia> myIT = runIT([0,1,2,3], [0,1,20,2], 0.5, 2.1, 10.5 , 2.4);
 
 julia> myIT.TK
@@ -261,7 +261,7 @@ Solve ODE for Individual Tolerance TKTD model
 Return an `Array{Array{Float64,1},1}`.
 
 # Example
-```julia-repl
+```julia
 julia> myIT = runIT_MCMC([0,1,2,3], [0,1,20,2], [0.5, 2.4],[2.5, 2.1],[10.5, 16.0],[5.0, 2.4]);
 
 julia> myIT.TK
