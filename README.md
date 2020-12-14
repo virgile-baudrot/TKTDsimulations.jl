@@ -22,3 +22,7 @@ julia> mySD.TD
  [1.0, 0.08208499862389876, 0.006737946999085473, 0.0005530843701478346]
  [1.0, 0.12245642825298195, 0.014995576820477731, 0.0018363047770289104]
 ```
+
+## For registration
+
+see [Registrator.jl](https://github.com/JuliaRegistries/Registrator.jl)
