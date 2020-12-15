@@ -23,6 +23,22 @@ julia> mySD.TD
  [1.0, 0.12245642825298195, 0.014995576820477731, 0.0018363047770289104]
 ```
 
-## For registration
+#### For registration
 
-see [Registrator.jl](https://github.com/JuliaRegistries/Registrator.jl)
+Registration is done using [Registrator.jl](https://github.com/JuliaRegistries/Registrator.jl).
+
+For the registration of this package, I did it with *Register pacakges* in [https://juliahub.com](https://juliahub.com)
+
+For its updates: I open the issue [Registrator trigger](https://github.com/virgile-baudrot/TKTDsimulations.jl/issues/8) and I add comment mentioning `@JuliaRegistrator register` and a realease notes (maybe more elaborate compared to these first release)
+
+```julia
+@JuliaRegistrator register
+
+Release notes:
+
+Check out my new features!
+```
+
+Then,  a `Pull Request` is done from the Julia Tagbot, and once merged the package is updated in JuliaHub. See the issues comments [Registrator trigger](https://github.com/virgile-baudrot/TKTDsimulations.jl/issues/8) for information. 
+
+After the above pull request is merged, it is recommended that a tag is created on this repository for the registered package version. Or, this will be done automatically if the Julia TagBot GitHub Action is installed.
