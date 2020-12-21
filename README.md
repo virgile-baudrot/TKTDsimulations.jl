@@ -8,6 +8,11 @@
 ## Examples
 
 ```julia
+myTK = runTK([0,1,2,3], [0,0,2,2], 0.5)
+```
+
+
+```julia
 julia> using TKTDsimulations
 
 julia> mySD = runSD_MCMC([0,1,2,3], [0,1,20,2], [0.5, 2.4],[2.5, 2.1],[10.5, 16.0],[5.0, 2.4]);
